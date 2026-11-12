@@ -1,0 +1,162 @@
+{
+  "author": "RugkeyPro",
+  "categories": [
+    "developer-tools",
+    "productivity"
+  ],
+  "changelog": "独立插件首次发布；不修改其他插件。",
+  "contributes": {
+    "agentTools": [
+      {
+        "description": "Read ONE local image file and attach it to the conversation as a multimodal image block, so a vision-capable model can actually see it (the built-in Read tool is text-only and cannot do this). Use it whenever the user references a screenshot, mockup, diagram, photo or any image file by path and wants the agent to look at it. Supports png, jpg, jpeg, webp and gif up to 10MB. Images inside the open workspace read without prompts; paths outside the workspace trigger a one-time user grant. Returns a short text summary plus the attached image — never echo base64 image data into your reply. Auto preview <=2048px/512KiB. Use crop in original pixel coordinates for fine text; detail=high <=4096px/1MiB. Original file preserved.",
+        "name": "read_image",
+        "planSafeActions": [
+          "read_image"
+        ],
+        "risk": "low",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "description": "Fixed action name.",
+              "enum": [
+                "read_image"
+              ],
+              "type": "string"
+            },
+            "path": {
+              "description": "Image file path — absolute, or relative to the open workspace.",
+              "type": "string"
+            },
+            "detail": {
+              "type": "string",
+              "enum": [
+                "auto",
+                "high"
+              ]
+            },
+            "crop": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "y": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "width",
+                "height"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "action",
+            "path"
+          ],
+          "type": "object"
+        }
+      },
+      {
+        "description": "Inspect ONE local image's metadata WITHOUT loading it into the conversation: format (by magic bytes), pixel dimensions and file size. Use it to check an image before reading it visually (read_image), or to answer size/dimension questions cheaply. Same path rules and supported formats as read_image.",
+        "name": "image_info",
+        "planSafeActions": [
+          "info"
+        ],
+        "risk": "low",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "description": "Fixed action name.",
+              "enum": [
+                "info"
+              ],
+              "type": "string"
+            },
+            "path": {
+              "description": "Image file path — absolute, or relative to the open workspace.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action",
+            "path"
+          ],
+          "type": "object"
+        }
+      },
+      {
+        "description": "List image files in the open workspace (png/jpg/jpeg/webp/gif) with sizes, so the agent can discover which images exist before reading any. Optionally scope to a workspace-relative directory. Read-only, results capped at 200 entries.",
+        "name": "list_images",
+        "planSafeActions": [
+          "list"
+        ],
+        "risk": "low",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "description": "Fixed action name.",
+              "enum": [
+                "list"
+              ],
+              "type": "string"
+            },
+            "dir": {
+              "description": "Optional workspace-relative directory to scope the listing.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        }
+      }
+    ]
+  },
+  "description": "参考 Codex 的图片输入预算思路：默认缩略预览、按需高精度、原图坐标裁剪。保留原文件。",
+  "engines": {
+    "piDesktop": ">=0.21.0"
+  },
+  "fs": {
+    "read": {
+      "root": "workspace",
+      "scope": [
+        "**/*.png",
+        "**/*.jpg",
+        "**/*.jpeg",
+        "**/*.webp",
+        "**/*.gif"
+      ]
+    }
+  },
+  "id": "local.image-budget",
+  "main": "main.js",
+  "name": "图片预算与局部查看",
+  "permissions": [
+    "fs.read",
+    "agent.tool.register"
+  ],
+  "safetyNotes": "纯只读插件：不声明任何出网域名、不写不删、不执行图片内容。文件访问全部经宿主 fs 策略 API：工作区内按声明的 glob 范围读取，范围外每条路径都需用户明确授权；宿主的密钥文件拒绝清单（.env、密钥、.git 等）始终生效。图片字节仅作为多模态输入附加到当前 agent 会话，不上传到任何其他位置。",
+  "schemaVersion": 1,
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": "https://github.com/RugkeyPro/pi-desktop-image-budget",
+  "homepage": "https://github.com/RugkeyPro/pi-desktop-image-budget"
+}
