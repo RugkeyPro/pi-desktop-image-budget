@@ -1,0 +1,1 @@
+This plugin derives read-only tool helpers from Vision Kit 0.2.0 by muzimu217, MIT license. Original repository: https://github.com/muzimu217/pi-desktop-plugins . Image preparation and budget logic are added by RugkeyPro. Bundled library notices are in THIRD-PARTY-NOTICES.txt. No affiliation with OpenAI, DeepSeek, or the original Vision Kit author is implied.
